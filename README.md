@@ -1,2 +1,2 @@
 # AArchive
-A repository for all contests held on Arbitrator
+A repository website for all contests held on Arbitrator
