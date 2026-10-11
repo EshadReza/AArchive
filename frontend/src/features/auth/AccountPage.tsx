@@ -79,6 +79,8 @@ export default function AccountPage() {
         <p><Link className="text-link" to="/profile">Edit profile</Link></p>
         {user.roles.includes("ADMINISTRATOR") && <p><Link className="text-link" to="/admin/users">Manage accounts</Link></p>}
         {user.roles.includes("ADMINISTRATOR") && <p><Link className="text-link" to="/admin/structure">Manage academic structure</Link></p>}
+        {user.roles.includes("ADMINISTRATOR") && <p><Link className="text-link" to="/admin/courses">Manage course catalog</Link></p>}
+        {user.roles.some((role) => ["TEACHER", "ADMINISTRATOR"].includes(role)) && <p><Link className="text-link" to="/offerings">Course offerings</Link></p>}
         <p><Link className="text-link" to="/change-password">Change password</Link></p>
         <p className="field-hint">Contest and academic pages are still being built.</p>
         <div className="form-actions">

@@ -31,7 +31,19 @@ typed parents, canonical labels, parent-scoped uniqueness, archive flags and rev
 section identity via PostgreSQL triggers. Batch creation and automatic ALL creation
 commit with audit; ancestor archive blocks new associations without deleting history.
 See [structure integrity and assignment contract](academic-structure.md#integrity-and-transactions).
-Courses/offerings/enrollment remain future models.
+S013 implements reusable Course; S014 implements Offering and TeacherAssignment.
+Enrollment remains future work.
+
+`academics.0003_course` adds department-owned Course with code, title, Decimal(4,2)
+credits, description, archive state and revision. Department/code uniqueness and
+validation checks are enforced in PostgreSQL. `0004_course_department_immutable`
+protects its parent against reassignment. No batch/term FK is present.
+Offering migrations `0005`/`0006` add unique matching academic tuples, protected
+FKs, immutable creator/tuple and retained effective-dated teacher history.
+See [offering persistence](offerings.md#persistence-and-transaction-boundary) for
+constraints, triggers, revision locking and migration behavior.
+
+See [catalog storage and offering contract](course-catalog.md#storage-audit-and-future-integration).
 
 ## Invitation storage (S011)
 

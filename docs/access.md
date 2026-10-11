@@ -26,16 +26,16 @@ missing objects deny even Administrators. Anonymous calls currently deny; S019
 adds explicit public-component policies and parent gates.
 
 Current global gates: `users.manage`, `roles.manage`, `system.manage`, `audit.view`
-(Administrator only), and `contest.create` (Administrator/Teacher). Global gates
+(Administrator only), and `contest.create`/`course.create` (Administrator/Teacher). Global gates
 do not authorize arbitrary objects. Every object check uses its registered model
 selector and filters by identity, using the same predicate as list filtering.
 There is no Administrator fallback around the adapter's integrity/privacy checks.
 
 Adapters own current assignments, enrollment, publication, parent gates and
-field/projection restrictions. They must use authoritative server data. The only
-production adapter now registered is the Administrator audit read policy. Tests
-register synthetic mark/offering adapters over fixture rows to verify the hooks;
-these are not deployed academic models.
+field/projection restrictions. They must use authoritative server data. Production adapters include the Administrator audit read policy and S014 Offering
+`course.view`/`course.manage`. The latter scopes Teachers to current assignments
+and additionally requires active ancestry for writes. Tests also use isolated
+synthetic adapters to verify the generic hooks.
 
 ### REST and worker integration
 
@@ -84,8 +84,9 @@ separate scoped policy without widening the existing global API.
 Scope IDs have no polymorphic FK to future tables. Activation requires a registered
 resource model and an existing UUID row. Authorization queries that actual resource.
 Future modules must keep IDs stable, prevent reuse and revoke grants on retirement.
-Revocation remains possible after the target disappears. Real offering/contest/group
-grants cannot yet be activated because their models/adapters are not implemented.
+Revocation remains possible after the target disappears. S014 registers real Offerings, so offering grants can now be stored. Their future
+mark/report actions still deny until the respective policy implements them.
+Contest/group grants still await their own models/adapters.
 
 ## Audited privilege commands
 
@@ -156,10 +157,20 @@ share that lock. No browser/source role claim bypasses current authorization.
 
 S012 academic administration uses current `system.manage` for reads and writes.
 Structure mutation and future assignment-context validation share the privilege lock;
-see [academic structure](academic-structure.md). Teacher read projections for future
-offering selection must be scoped explicitly rather than opening management APIs.
+see [academic structure](academic-structure.md). S014 exposes separate active-only selection routes to Teachers while preserving
+admin-only management APIs.
 
-Integration owners: S008 sessions (implemented); S010 lifecycle locking (implemented); S011 accounts (implemented); S014/S016 assignments;
+S013 catalog mutation uses `system.manage`; the catalog read selector admits current
+Administrators to all records and current Teachers only to available courses in
+active departments. Students/anonymous callers deny. Reads do not grant offering
+management; see [course catalog](course-catalog.md).
+
+Integration owners: S008 sessions (implemented); S010 lifecycle locking (implemented); S011 accounts (implemented); S014 offering assignments (implemented), S016 contest assignments;
 S018 groups; S019/S020 visibility; S041 provisioning; S053/S061 grading/privacy;
 S070-S078 reports/exports; S085 endpoint inventory. Each must test its real adapter
 and projection before enabling an action. See [S007 evidence](sprints/S007.md).
+
+S014 [offering services](offerings.md) attach eligible creators, reserve assignment
+edits/archive for Administrators, retain ended history, and revoke offering-scoped
+grants when membership ends. Teacher option routes expose active structure metadata
+without opening administrator hierarchy management.

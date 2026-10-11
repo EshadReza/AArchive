@@ -1,8 +1,8 @@
 # Academic structure (S012)
 
 Implemented for ADMIN-010, SRS 13/16.2/43/44 and D03/ADR 0002.
-[S012 evidence](sprints/S012.md) records verification. Courses and offerings remain
-S013/S014; this feature introduces no enrollment, course catalog or contest links.
+[S012 evidence](sprints/S012.md) records verification. The [course catalog](course-catalog.md) is implemented in S013; [offerings](offerings.md) are implemented in S014. Enrollment and contest links remain
+future work.
 
 ## Browser walkthrough
 
@@ -97,7 +97,8 @@ transaction before persisting a structural association. It requires department,
 batch, term and section UUIDs, checks same-parent membership and all archive gates,
 and takes the same privilege lock until the outer transaction commits. Calling it
 outside a transaction fails. It does not authorize the actor or validate a Course;
-S013/S014 must add those requirements and their database relationship constraints.
+S013 adds `require_course_context` to include Course/Department validation; S014
+implements its authorization and database relationship constraints.
 Returning validated IDs and committing before writing would lose the archive-race
 protection and is not supported. Historical reads do not call this active-only gate.
 

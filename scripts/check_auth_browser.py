@@ -36,11 +36,13 @@ def main():
             user = User.objects.create_user(f"browser-{project}@iut.example", "synthetic-browser-password-123",
                                             display_name="Test Member")
             User.objects.filter(pk=user.pk).update(state="ACTIVE", email_verified_at=timezone.now())
-            for prefix in ["recovery", "lifecycle-admin"]:
-                extra = User.objects.create_user(f"{prefix}-{project}@iut.example", "synthetic-browser-password-123", display_name="Recovery Member")
+            for prefix in ["recovery", "lifecycle-admin", "offering-teacher", "offering-colleague"]:
+                extra = User.objects.create_user(f"{prefix}-{project}@iut.example", "synthetic-browser-password-123", display_name=prefix if prefix.startswith("offering-") else "Recovery Member")
                 User.objects.filter(pk=extra.pk).update(state="ACTIVE", email_verified_at=timezone.now())
                 if prefix == "lifecycle-admin":
                     UserRole.objects.create(user=extra, role="ADMINISTRATOR")
+                elif prefix.startswith("offering-"):
+                    UserRole.objects.create(user=extra, role="TEACHER")
         connection.close()
         backend_port, frontend_port = free_port(), free_port()
         while frontend_port == backend_port:

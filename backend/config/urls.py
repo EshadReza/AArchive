@@ -1,5 +1,14 @@
 from django.urls import path
 
+from apps.academics.courses.api import CourseArchive, CourseDetail, CourseList
+from apps.academics.offerings.api import (
+    OfferingArchive,
+    OfferingDetail,
+    OfferingList,
+    OfferingOptions,
+    StaffOptions,
+    Teachers,
+)
 from apps.academics.structure.api import StructureArchive, StructureDetail, StructureList
 from apps.accounts.api.views import (
     AcceptInvitationView,
@@ -22,6 +31,14 @@ from apps.audit.api import AuditDetailView, AuditListView
 from .health import HealthView
 
 urlpatterns = [
+    path("api/course-offerings", OfferingList.as_view()),
+    path("api/course-offerings/staff-options", StaffOptions.as_view()),
+    path("api/course-offerings/<uuid:pk>", OfferingDetail.as_view()),
+    path("api/course-offerings/<uuid:pk>/teachers", Teachers.as_view()),
+    path("api/course-offerings/<uuid:pk>/archive", OfferingArchive.as_view()),
+    path("api/courses", CourseList.as_view()),
+    path("api/courses/<uuid:pk>", CourseDetail.as_view()),
+    path("api/courses/<uuid:pk>/archive", CourseArchive.as_view()),
     path("api/users", AccountListView.as_view()),
     path("api/users/<uuid:pk>", AccountDetailView.as_view()),
     path("api/users/<uuid:pk>/roles", RoleView.as_view()),
@@ -52,4 +69,9 @@ for kind in ("departments", "batches", "terms", "sections"):
             path(f"api/{kind}/<uuid:pk>", StructureDetail.as_view(kind=kind)),
             path(f"api/{kind}/<uuid:pk>/archive", StructureArchive.as_view(kind=kind)),
         ]
+    )
+
+for kind in ("departments", "batches", "terms", "sections"):
+    urlpatterns.append(
+        path(f"api/course-offering-options/{kind}", OfferingOptions.as_view(kind=kind))
     )

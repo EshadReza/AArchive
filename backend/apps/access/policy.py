@@ -112,7 +112,7 @@ def allows(actor, action, resource=None):
         return False
     if action in _ADMIN_ACTIONS:
         return PlatformRole.ADMINISTRATOR in principal.roles
-    if action == "contest.create":
+    if action in {"contest.create", "course.create"}:
         return bool(principal.roles & {PlatformRole.ADMINISTRATOR, PlatformRole.TEACHER})
     return False
 

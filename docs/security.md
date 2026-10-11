@@ -60,6 +60,11 @@ Administrator checks before lists/counts/lookups and again under the privilege l
 for writes. Strict fields, expected revisions, immutable parents, protected foreign
 keys and ancestor-aware archive gates prevent accidental reassignment or loss of
 history. Academic changes and reviewed metadata audit records commit atomically.
+S013 [course catalog](course-catalog.md) uses admin-only mutation and a shared
+current-role read selector. Teachers see only available courses/departments; Students
+and anonymous users cannot enumerate this management catalog. Credits are bounded
+decimal strings, descriptions render as inert text, departments cannot be reassigned,
+and audited revisions protect against stale edits.
 Current-state predicates are tested for every state; they are eligibility ceilings,
 not resource permissions. ANONYMIZED denies eligibility, but actual erasure and
 terminal transition enforcement belong to their later services.
@@ -173,3 +178,14 @@ S026-S045 verify hostile archives and recovery; S053-S068 verify grades/re-impor
 S075-S085 verify exports/revocation/governance; S088-S093 verify production limits
 and recovery. S085 maintains an endpoint authorization inventory. Passing a local
 test suite is not a claim of an independent penetration assessment.
+
+## Implemented offering boundary (S014)
+
+Current Teacher assignment scopes offering reads/settings; Administrators alone
+change assignments/archive and enumerate eligible staff. Teacher selection routes
+expose active academic metadata, not account email or admin management. All writes
+reauthorize under the shared privilege lock, enforce revision/context and commit
+with audit. Removal ends membership and revokes scoped grants atomically; retained
+authorship/history grants no current rights. Archived ancestry blocks new writes.
+See [offering authorization](offerings.md#authorization); Contest authority, marks
+and enrollment remain separate future policies.

@@ -111,6 +111,17 @@ new assignments through descendants. The admin screen and revisioned APIs are
 documented in [academic structure](../academic-structure.md); future offering writes
 must use its transaction-scoped same-parent/archive validation.
 
+S013 implements the [reusable course catalog](../course-catalog.md) with immutable
+department ownership, no batch/term fields, unique canonical codes per department
+and bounded decimal credits (0–99.99, two places). The credit bound is a storage
+default, not a claimed institutional rule. Admins manage/archive records; Teachers
+read only available catalog entries, without gaining offering assignment rights.
+
+S014 implements [offerings](../offerings.md): matching immutable academic tuples,
+creator staff attachment, admin-managed multi-teacher assignments, immutable ended
+history, and immediate scope/grant revocation on removal. Current co-teachers share
+name-settings rights; admin-only creators receive no implicit Teacher platform role.
+
 Each versioned participant has exactly one individual ImportedUser or Team subject,
 with same-version references. TeamMember links Team to ImportedUser with source
 membership times. SourceIdentity is stable across ImportedUser snapshots and has
@@ -253,3 +264,14 @@ External master prompt because that text is unavailable; local Section 48 is
 Page Permissions. Never invent missing source decisions. S001's ledger records
 corrected references and contracts. Phase 2/Future integration requirements remain
 outside MVP launch scope and keep their stated external gates.
+
+### S014 permission clarification (D04)
+
+Assignment changes and archive are Administrator-only; eligible Teachers/Admins
+may create and are attached automatically. Current co-assigned Teachers share
+name-settings rights on available offerings. Removing a membership retains its
+history and authorship while revoking current scope and offering grants. Restoring
+membership creates a fresh row without restoring grants. These choices implement
+the SRS's co-teacher rights without exposing global Contest operations. See the
+[offering authorization matrix](../offerings.md#authorization). Future grading
+adapters must use current membership rather than the historical assigner/creator.

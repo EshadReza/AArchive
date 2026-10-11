@@ -176,7 +176,9 @@ merely because its category is listed below.
 | Admin creation, invitations and own profile | S011 | Implemented atomic creation, challenge issue/acceptance and fixed-outcome profile audit; credentials and raw profile text excluded |
 | Bulk account operations | S016 | Pending |
 | Academic structure create/edit/archive | S012 | Implemented atomic before/after bounded academic metadata, parent UUID and revision; includes automatic ALL creation |
-| Enrollment/teacher assignment | S014-S016 | Pending |
+| Course catalog changes | S013 | Atomic bounded before/after metadata and description digest; no arbitrary description text in immutable audit |
+| Offering/teacher assignment | S014 | Atomic offering tuple/name/status/revision and assignment membership transitions; scoped grant revocations audited |
+| Enrollment / ContestTeacher | S015-S016 | Pending |
 | Groups and visibility | S018-S020 | Pending |
 | Upload/import/re-import and identity mappings | S027-S045, S064-S067 | Pending |
 | Mark assignment/override/publish/lock/unlock/correction | S053-S061, S067 | Pending |
@@ -185,3 +187,7 @@ merely because its category is listed below.
 
 The durable outbox/event delivery is S023. Audit rows are not an asynchronous job
 queue, and logging a request is not proof its external side effects succeeded.
+
+S014 registers `academics.offering.changed` (`academics.offering` UUID target) and
+`academics.teacher.changed` (`academics.teacher_assignment` UUID target). Reviewed
+projections and rollback boundaries are documented in [offerings](offerings.md).

@@ -2,7 +2,7 @@
 
 Planning setup is complete: canonical Markdown requirements, the verbatim archive
 layout, architecture/contribution/security/API/database guides, a detailed sprint
-backlog, and a local context helper exist. S001-S012 are complete: contracts,
+backlog, and a local context helper exist. S001-S014 are complete: contracts,
 backend/frontend foundations, local services, API proxy, CI configuration and
 platform account models, immutable audit service/read API, and central role/scope
 authorization with audited privilege commands, plus session login/logout and
@@ -10,8 +10,10 @@ current-account UI, institutional Student registration and single-use email
 verification with optional approval gating, password recovery/change and audited
 lifecycle commands with proactive session revocation, administrator account screens,
 invitations and restricted self-profile editing, plus academic departments, batches,
-terms and sections with protected parents and archival. Account and structure
-management are runnable; courses, offerings and contest workflows remain pending.
+terms and sections with protected parents and archival, and a reusable department
+course catalog, course offerings and retained multiple teacher assignments. Account,
+academic and offering management are runnable; enrollment and contest workflows
+remain pending.
 
 **Next task:** selected from this ledger and TASKS.md by
 `python3 scripts/sprint_context.py --next`; do not maintain a separate fixed ID.
@@ -39,8 +41,8 @@ and affected downstream cards. Add child-sprint rows when splitting work.
 | S010 | DONE | [Recovery and lifecycle evidence](sprints/S010.md): 318 backend tests, 37 frontend tests and 13 browser checks passed, plus lint/types/build, migration roundtrip/drift and workflow validation. One-use resets, password changes, admin approval/lifecycle commands, last-admin protection and proactive subject-session revocation implemented. |
 | S011 | DONE | [Account administration and invitation evidence](sprints/S011.md): 369 backend tests, 43 frontend tests, 15 browser checks, lint/types/build, migration roundtrip/drift and workflow validation passed. Admin list/detail/create, reviewed role/lifecycle changes, single-use invitations and display-name-only self-profile implemented. |
 | S012 | DONE | [Academic structure evidence](sprints/S012.md): 416 backend tests, 48 frontend tests, 17 browser checks, lint/types/build, migration/trigger roundtrip and workflow checks passed. Admin hierarchy management, atomic ALL creation, protected parents, archive inheritance and assignment-context validation implemented. |
-| S013 | TODO |  |
-| S014 | TODO |  |
+| S013 | DONE | [Reusable catalog evidence](sprints/S013.md): 460 backend tests, 53 frontend tests, 19 browser checks, lint/types/build and migration/trigger roundtrip passed. Department-owned Course, decimal credits, filtered Teacher reads, admin catalog UI, audited revisions/archive and future offering-context validation implemented. |
+| S014 | DONE | [Offering evidence](sprints/S014.md): 489 backend tests, 58 frontend tests, 21 browser checks, lint/types/build and migration/trigger roundtrip passed. Matching immutable offering tuples, audited creator/co-teacher assignments, retained history, immediate scope/grant revocation and responsive editor implemented. |
 | S015 | TODO |  |
 | S016 | TODO |  |
 | S017 | TODO |  |
@@ -138,31 +140,37 @@ and affected downstream cards. Add child-sprint rows when splitting work.
 
 ## Latest handoff
 
-- Completed S012 on 2026-10-09. [Evidence](sprints/S012.md) and the
-  [academic structure guide](academic-structure.md) document API/UI, archive policy,
-  parent/ALL protections, migrations and future assignment integration.
-- `/account` now links Administrators to `/admin/structure`. All four record types
-  support paginated admin reads/create/edit/archive, named parent selection and
-  filtering. Archive requires review/confirmation; revisions reject stale edits.
-- Batch creation atomically creates its reserved ALL section and audits both rows.
-  Parent references cannot change, including through direct database updates.
-  Archive retains UUIDs/history, blocks new children/assignments and makes descendants
-  unavailable. There is no hard-delete, restore or course/offering implementation yet.
-- Future assignment writers must authorize the actor and call
-  `require_assignment_context` inside the same transaction as their write. It checks
-  Department/Batch/Term/Section membership and active ancestors under the shared
-  privilege lock. S013/S014 add Course validation and database constraints for their
-  new references. Teacher selection reads need an explicitly scoped projection;
-  S012 management APIs remain Administrator-only.
-- Final checks: 416 backend tests (77.84s), 48 frontend tests, 5 foundation browser
-  checks (7.1s), 12 real application browser checks (1.3m), lint/types/build,
-  academic schema/trigger apply/reverse/reapply/no-op, migration drift, workflow
-  syntax, runner compilation and desktop/mobile visual review passed. Documentation
-  links/whitespace, ignore checks and `git diff --check` passed. Browser resources
-  and the S012 synthetic Compose service/network/volume were removed.
-- No new environment variables are needed; apply migrations before using the page.
-  Existing invitation/recovery delivery limitations remain documented. G01 still
-  gates S025's exporter schema work; the supplied ZIP layout remains preserved.
-- The validated ledger now selects S013 (reusable course catalog). Continue using
-  the selector and preserve existing working-tree contents. No commit, push, real
-  institutional data, external email or deployment was performed.
+- Completed S014 on 2026-10-11, resuming the interrupted sprint. The
+  [evidence](sprints/S014.md) and [offering guide](offerings.md) document API
+  payloads, permissions, persistence, migration checks and local use.
+- Account links eligible Teachers/Admins to `/offerings`. Create by selecting a
+  matching Course/Batch/Term/Section; the creator is attached automatically. The
+  tuple and original creator remain immutable. Administrators see all offerings;
+  Teachers see only current assignments, with equal name-settings rights.
+- Administrator assignment/removal/archive controls require review. Removal ends
+  a membership, revokes scoped grants and denies the removed Teacher's next read
+  or write. Historical authorship and dated assignments remain. Reassignment
+  creates a new history row without restoring old grants. Global Administrator
+  authority remains independent of assignment.
+- Archived offerings/ancestry block settings and new assignments; current staff
+  can still read history, and admins can remove memberships. There is no restore
+  or delete endpoint. Teacher academic selectors expose only active metadata;
+  staff email selection remains Administrator-only.
+- Final gates passed: 489 backend tests (143.49s), 58 frontend tests, 5 foundation
+  browser checks (5.6s), 16 real application browser checks (1.6m), lint/types/build,
+  no migration drift, migration/trigger apply-reverse-reapply/no-op and all 108
+  ledger references. The mobile selector overflow found during browser testing
+  was fixed and reverified; desktop/mobile screenshots were reviewed. The S014
+  disposable services/volume were removed; documentation links and ignore checks
+  passed.
+- Apply migrations before opening offerings. No new environment variables or
+  dependencies are needed. S015 should reuse stable Offering IDs, current scoped
+  permissions and the transaction lock for enrollment. S016 ContestTeacher remains
+  separate; offering membership gives no global contest authority or implemented
+  grading workflow. G01 exporter schemas/semantics still gates S025.
+- The selector chooses S015 (enrollment and historical membership). Keep using
+  the ledger. S013 and S014 are included together in the user-requested main-branch
+  commit following baseline `2894f44` (S001-S012). The checkout contains source,
+  migrations, tests and developer documentation needed to continue from a clone.
+  Local credentials, databases, dependencies and generated artifacts stay ignored.
+  No deployment, real institutional data or external messages are included.

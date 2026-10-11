@@ -1,3 +1,5 @@
+import { OfferingList, OfferingDetail } from '../features/offerings/Offerings';
+import CoursePage from '../features/courses/CoursePage';
 import StructurePage from '../features/academics/StructurePage';
 import { AdminAccountList, AdminAccountCreate, AdminAccountDetail } from '../features/accounts/AdminAccounts';
 import ProfilePage from '../features/accounts/ProfilePage';
@@ -33,6 +35,9 @@ export function App() {
           </div>
         </section>} />
         {Workshop && <Route path="/dev/primitives" element={<Workshop />} />}
+        <Route path="/offerings" element={<OfferingList />} />
+        <Route path="/offerings/:id" element={<OfferingDetail />} />
+        <Route path="/admin/courses" element={<CoursePage />} />
         <Route path="/admin/structure" element={<StructurePage />} />
         <Route path="/admin/users" element={<AdminAccountList />} />
         <Route path="/admin/users/new" element={<AdminAccountCreate />} />

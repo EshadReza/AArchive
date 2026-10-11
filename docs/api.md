@@ -6,6 +6,8 @@ S009 adds [registration, verification and resend](registration.md#api-contract).
 S010 adds [recovery and lifecycle commands](recovery-lifecycle.md); S011 adds
 [admin accounts, invitations and own-profile endpoints](account-management.md#api-contract).
 S012 adds [academic structure administration](academic-structure.md#api).
+S013 adds [course catalog endpoints](course-catalog.md#authorization-and-api).
+S014 adds [offering, teacher-history and selection endpoints](offerings.md#api-contract).
 Other business routes below remain planned;
 individual sprints implement them. Use [progress](progress.md) for actual status and [TASKS](../TASKS.md) for
 the detailed work. The SRS's Sections 10, 16, 18, 32, and 46 are the product basis.
@@ -116,8 +118,10 @@ Later endpoint sprints verify integration with real responses and authorization.
 | `/api/users/{id}/lifecycle` | Implemented Administrator-only audited lifecycle commands | S010 |
 | `/api/users`, `/api/users/{id}`, `/api/users/{id}/roles`, `/api/users/{id}/invitation`, `/api/profile`, `/api/auth/invitation/accept` | Implemented admin accounts, invitations and limited self-profile; [contract](account-management.md#api-contract) | S011 |
 | `/api/departments`, `/api/batches`, `/api/terms`, `/api/sections` (plus detail/archive) | Implemented Administrator-only academic structure; [contract](academic-structure.md#api) | S012 |
-| `/api/courses` | Reusable catalog | S013 |
-| `/api/course-offerings`, `/{id}/teachers`, `/{id}/enrollments` | Scoped offering/teacher/roster operations | S014-S015 |
+| `/api/courses`, `/{id}`, `/{id}/archive` | Implemented reusable catalog, admin writes and filtered Teacher reads; [contract](course-catalog.md) | S013 |
+| `/api/course-offerings`, `/{id}`, `/{id}/teachers`, `/{id}/archive`, `/staff-options` | Implemented scoped offerings, retained teacher assignments and admin staffing | S014 |
+| `/api/course-offering-options/{kind}` | Implemented active academic selectors for Teachers/Admins | S014 |
+| `/api/course-offerings/{id}/enrollments` | Planned roster operations | S015 |
 | `/api/account-imports` | Admin CSV/XLSX preview and confirmation | S016 |
 | `/api/access-groups`, `/{id}/members` | Delegated group management | S018 |
 | `/api/visibility`, `/preview` | Scoped policy read/write and effect preview | S020 |

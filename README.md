@@ -11,7 +11,7 @@ This repository contains the developer handoff and implementation plan.
 architecture decisions. S002 adds a runnable Django/DRF backend foundation with
 PostgreSQL configuration and a health endpoint. S003 adds a React/TypeScript frontend
 shell, accessible interaction components, a session/CSRF API client and a development
-showcase. Course, offering and contest features remain pending. Celery/Redis and S3-compatible storage
+showcase. Contest features remain pending. Celery/Redis and S3-compatible storage
 remain part of the selected architecture. S004 supplies local PostgreSQL/Redis,
 the frontend API proxy and CI checks. [S005](docs/sprints/S005.md) adds the custom
 platform user, profile, fixed roles, account-state predicates and first migration.
@@ -27,6 +27,10 @@ See the [account-management guide](docs/account-management.md) to try these scre
 [S012](docs/sprints/S012.md) adds academic departments, batches, terms and sections
 with admin management, protected parents, archive rules and a default ALL section.
 See [academic structure](docs/academic-structure.md) for a local walkthrough.
+[S013](docs/sprints/S013.md) adds the reusable department course catalog, guarded
+reads/writes and reviewed archive UI; see [course catalog](docs/course-catalog.md).
+[S014](docs/sprints/S014.md) adds course offerings, shared teacher settings rights,
+admin assignment review and retained membership history; see [offerings](docs/offerings.md).
 S007 adds shared role/scope policy helpers, audited privilege services, scoped-grant
 storage and a guarded local first-Administrator command. See [authorization guide](docs/access.md).
 
@@ -53,7 +57,7 @@ phase. The helper is read-only; the agent performs the actual implementation.
 
 ## Continuing from a fresh clone
 
-This repository contains the implementation through **S012** and the plan for the
+This repository contains the implementation through **S014** and the plan for the
 remaining project. Another developer can continue without the original chat:
 
 1. Follow the local setup below: install the pinned runtimes, install dependencies
@@ -62,7 +66,7 @@ remaining project. Another developer can continue without the original chat:
 2. Read `AGENTS.md`, `ARCHITECTURE.md` and `docs/progress.md`. The canonical SRS is
    `docs/requirements.md`; detailed completed-sprint evidence is in `docs/sprints/`.
 3. Run `python3 scripts/sprint_context.py --next` for the next ready card and its
-   focused requirements. At this handoff it selects **S013 — reusable course catalog**.
+   focused requirements. At this handoff it selects **S015 — enrollment management**.
 4. Use `CONTRIBUTING.md` for checks and update the progress ledger after each sprint.
 
 Local `.env`, databases, account records, installed dependencies, generated builds
@@ -86,6 +90,8 @@ S025. They do not block the next academic/catalog sprints.
 | [docs/database.md](docs/database.md) | Planned relational model and integrity rules |
 | [docs/security.md](docs/security.md) | Permission, privacy, import, and operational controls |
 | [docs/audit.md](docs/audit.md) | Implemented audit service, read API and feature coverage checklist |
+| [docs/offerings.md](docs/offerings.md) | Offering API/UI, teacher history, permissions and integrity |
+| [docs/course-catalog.md](docs/course-catalog.md) | Reusable course catalog API, management UI, permissions and offering integration |
 | [docs/academic-structure.md](docs/academic-structure.md) | Academic hierarchy, management API/UI, archive and assignment rules |
 | [docs/account-management.md](docs/account-management.md) | Admin accounts, invitations, reviewed access changes and self-profile |
 | [docs/recovery-lifecycle.md](docs/recovery-lifecycle.md) | Password reset/change, admin transitions and session revocation |

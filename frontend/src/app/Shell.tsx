@@ -10,6 +10,7 @@ export function Shell({ navigation, children }: { navigation: ReactNode; childre
     if (previousPath.current !== pathname) main.current?.focus();
     previousPath.current = pathname;
     document.title = pathname === '/dev/primitives' ? 'Interface workshop · AArchive' :
+      pathname === '/admin/courses' ? 'Course catalog · AArchive' :
       pathname === '/admin/structure' ? 'Academic structure · AArchive' :
       pathname.startsWith('/admin/users') ? 'Accounts · AArchive' :
       ['/profile', '/accept-invitation', '/login', '/account', '/register', '/verify-email', '/resend-verification', '/forgot-password', '/reset-password', '/change-password'].includes(pathname) ? 'Account · AArchive' : 'AArchive';

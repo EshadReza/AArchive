@@ -41,7 +41,14 @@ def record_event(
     if action not in EVENTS:
         raise ValidationError("Unregistered audit action.")
     target_type = EVENTS[action][0]
-    if target_type in {"accounts.user", "access.grant", "academics.structure"}:
+    if target_type in {
+        "accounts.user",
+        "access.grant",
+        "academics.structure",
+        "academics.course",
+        "academics.offering",
+        "academics.teacher_assignment",
+    }:
         try:
             target_id = str(UUID(str(target_id)))
         except (ValueError, TypeError, AttributeError) as exc:

@@ -94,7 +94,7 @@ function StructurePanel({ kind }: { kind: Kind }) {
   </>;
 }
 
-function ParentPicker({ kind, selected, onSelect, disabled }: { kind: Kind; selected: Structure | null; onSelect: (row: Structure) => void; disabled: boolean }) {
+export function ParentPicker({ kind, selected, onSelect, disabled }: { kind: Kind; selected: Structure | null; onSelect: (row: Structure) => void; disabled: boolean }) {
   const [page, setPage] = useState<Awaited<ReturnType<typeof listStructure>> | null>(null); const [url, setUrl] = useState(`/api/${kind}?archived=false`); const [error, setError] = useState(''); const [retry, setRetry] = useState(0);
   useEffect(() => { const controller = new AbortController(); void listStructure(url, kind, controller.signal).then((value) => { if (!controller.signal.aborted) setPage(value); }).catch(() => { if (!controller.signal.aborted) setError('Could not load parents.'); }); return () => controller.abort(); }, [url, kind, retry]);
   function go(path: string) { setPage(null); setError(''); setUrl(path); setRetry((n) => n + 1); }

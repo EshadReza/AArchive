@@ -5,6 +5,7 @@ omitted, including their names; known fields must match their bounded vocabulary
 """
 
 import json
+import re
 from uuid import UUID
 
 from django.core.exceptions import ValidationError
@@ -28,6 +29,55 @@ CHANNELS = frozenset({"", "browser", "worker", "management_command"})
 SYSTEM_ACTORS = frozenset({"maintenance", "scheduler", "bootstrap", "authentication"})
 # action -> (target type, field -> (allowed values, is list))
 EVENTS = {
+    "academics.offering.changed": (
+        "academics.offering",
+        {
+            "course_id": (canonical_uuid, False),
+            "batch_id": (canonical_uuid, False),
+            "term_id": (canonical_uuid, False),
+            "section_id": (canonical_uuid, False),
+            "name": (
+                lambda v: 1 <= len(v) <= 200 and v == v.strip() and all(ord(c) >= 32 for c in v),
+                False,
+            ),
+            "status": (("ACTIVE", "ARCHIVED"), False),
+            "revision": (
+                lambda v: len(v) <= 10 and v.isascii() and v.isdigit() and 0 < int(v) <= 2147483647,
+                False,
+            ),
+        },
+    ),
+    "academics.teacher.changed": (
+        "academics.teacher_assignment",
+        {
+            "offering_id": (canonical_uuid, False),
+            "teacher_id": (canonical_uuid, False),
+            "status": (("ASSIGNED", "ENDED"), False),
+        },
+    ),
+    "academics.course.changed": (
+        "academics.course",
+        {
+            "department_id": (canonical_uuid, False),
+            "code": (
+                lambda v: (
+                    1 <= len(v) <= 64 and v == v.strip().upper() and all(ord(c) >= 32 for c in v)
+                ),
+                False,
+            ),
+            "title": (
+                lambda v: 1 <= len(v) <= 200 and v == v.strip() and all(ord(c) >= 32 for c in v),
+                False,
+            ),
+            "credits": (lambda v: re.fullmatch(r"[0-9]{1,2}\.[0-9]{2}", v) is not None, False),
+            "description_digest": (lambda v: re.fullmatch(r"[0-9a-f]{64}", v) is not None, False),
+            "status": (("ACTIVE", "ARCHIVED"), False),
+            "revision": (
+                lambda v: len(v) <= 10 and v.isascii() and v.isdigit() and 0 < int(v) <= 2147483647,
+                False,
+            ),
+        },
+    ),
     "academics.structure.changed": (
         "academics.structure",
         {

@@ -59,7 +59,7 @@ def actors():
 
 @pytest.fixture
 def resources(actors, monkeypatch):
-    """Synthetic adapter proving hooks; no real academic/contest policy is shipped.
+    """Synthetic adapter proving hooks independently of shipped resource policies.
 
     Existing profiles stand in for resource rows. Only this test registers these
     models; the assignment map is synthetic trusted fixture data, never request input.

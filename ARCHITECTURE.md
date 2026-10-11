@@ -35,6 +35,17 @@ departments, batches, terms and sections. Protected typed parents, scoped label
 uniqueness, archive gates and reviewed admin mutation use existing authorization
 and audit. Future assignment writers must reuse the atomic context validation
 described in [academic-structure.md](docs/academic-structure.md).
+S013 adds `academics/courses/` and `frontend/src/features/courses/` for the reusable
+department course catalog. Administrator mutations share privilege locking and audit;
+Teacher read projections exclude archived courses/departments. Courses have no term
+or batch FK. See [course-catalog.md](docs/course-catalog.md) for the transaction
+boundary future offering writers must use.
+S014 adds `academics/offerings/` and `frontend/src/features/offerings/` for scoped
+offering creation/settings and admin-managed multiple teacher assignments. Matching
+academic tuples and immutable authorship/history are enforced in PostgreSQL; writes
+share authorization, revision, privilege-lock and audit boundaries. The Offering
+policy registers `course.view`/`course.manage`; membership never implies Contest
+authority. See [offerings](docs/offerings.md) for the implemented contract.
 The real browser suite in `frontend/e2e-auth/` uses isolated databases and a
 temporary test mailbox. See [registration.md](docs/registration.md).
 
