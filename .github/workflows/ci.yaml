@@ -1,0 +1,89 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend and development proxy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      TEST_DATABASE_URL: postgresql://aarchive_ci:ci-only-password@127.0.0.1:5432/aarchive_ci
+      DATABASE_URL: postgresql://aarchive_ci:ci-only-password@127.0.0.1:5432/aarchive_ci
+    services:
+      postgres:
+        image: postgres:17.11@sha256:d74eeac9a635390a49bc21bd49fccd973de707e2a53a76ac49b552b8712ec46f
+        env:
+          POSTGRES_USER: aarchive_ci
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: aarchive_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U aarchive_ci -d aarchive_ci"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: '0.12.23'
+          python-version: '3.14.7'
+          enable-cache: true
+      - name: Backend gate with real PostgreSQL
+        run: bash scripts/check_backend.sh
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Match the tested npm version
+        run: npm install --global npm@10.9.8
+      - name: Install frontend from lockfile
+        run: npm ci --prefix frontend
+      - name: Verify the real Vite-to-Django proxy and CSRF boundary
+        run: uv run --locked python scripts/check_dev_proxy.py
+      - name: Install Chromium for real session checks
+        run: cd frontend && npx --no-install playwright install --with-deps chromium
+      - name: Verify real sign-in, logout, lockout and suspension in Chromium
+        run: uv run --locked python scripts/check_auth_browser.py
+      - name: Validate development Compose configuration
+        run: docker compose --env-file .env.example config --quiet
+
+  frontend:
+    name: Frontend and browser checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Match the tested npm version
+        run: npm install --global npm@10.9.8
+      - name: Install frontend from lockfile
+        run: npm ci
+      - name: Lint, types, unit tests and production build
+        run: npm run check
+      - name: Install Chromium and OS dependencies
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Keyboard, accessibility and production-boundary checks
+        run: npm run test:e2e

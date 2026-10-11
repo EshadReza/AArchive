@@ -1,0 +1,53 @@
+import { expect, test } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
+test('admin manages academic structure and archives without losing history', async ({ page }, info) => {
+  const suffix = info.project.name.toUpperCase();
+  const department = `CSE-${suffix}`;
+  const batch = `2026-${suffix}`;
+  await page.goto('/login');
+  await page.getByLabel('Institutional email').fill(`lifecycle-admin-${info.project.name}@iut.example`);
+  await page.getByLabel('Password', { exact: false }).fill('synthetic-browser-password-123');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.getByRole('link', { name: 'Manage academic structure' }).click();
+  async function save(label: string, name: string) {
+    await page.getByLabel('Label', { exact: false }).fill(label);
+    await page.getByLabel('Name', { exact: false }).fill(name);
+    await page.getByRole('button', { name: 'Save record' }).click();
+    await expect(page.getByRole('button', { name: `Edit ${label}`, exact: true })).toBeVisible();
+  }
+  await save(department, 'Computing');
+  await page.getByLabel('Record type').selectOption('batches');
+  await page.getByRole('radio', { name: `${department} — Computing`, exact: true }).check();
+  await save(batch, 'Class 2026');
+  await page.getByLabel('Record type').selectOption('terms');
+  await page.getByRole('radio', { name: `${batch} — Class 2026`, exact: false }).check();
+  await save(`T1-${suffix}`, 'First semester');
+  await page.getByLabel('Record type').selectOption('sections');
+  await expect(page.getByRole('button', { name: 'Archive ALL', exact: true }).first()).toBeDisabled();
+  await page.getByRole('radio', { name: `${batch} — Class 2026`, exact: false }).check();
+  await page.getByRole('checkbox', { name: 'Limit to selected parent' }).check();
+  await page.getByRole('button', { name: 'Apply filters' }).click();
+  await save(`A-${suffix}`, 'Section A');
+  await page.getByRole('button', { name: `Edit A-${suffix}`, exact: true }).click();
+  await page.getByLabel('Name', { exact: false }).fill('Updated section');
+  await page.getByRole('button', { name: 'Save record' }).click();
+  await expect(page.getByText('Updated section', { exact: true })).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  await page.screenshot({ path: `test-results/structure-${info.project.name}.png`, fullPage: true });
+  await page.getByLabel('Record type').selectOption('departments');
+  await page.getByRole('button', { name: `Archive ${department}`, exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Review archive' })).toBeFocused();
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.getByRole('button', { name: `Archive ${department}`, exact: true }).click();
+  await page.getByRole('button', { name: 'Confirm archive' }).click();
+  await expect(page.getByRole('button', { name: `Edit ${department}`, exact: true })).toBeDisabled();
+  await page.getByLabel('Record type').selectOption('terms');
+  await expect(page.getByRole('button', { name: `Edit T1-${suffix}`, exact: true })).toBeDisabled();
+  await expect(page.getByText('First semester', { exact: true }).first()).toBeVisible();
+  await page.goto('/account');
+  await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+  await page.goto('/admin/structure');
+  await expect(page.getByRole('alert')).toHaveText('Administrator access is required.');
+});

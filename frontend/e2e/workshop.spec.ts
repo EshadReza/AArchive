@@ -1,0 +1,53 @@
+import { expect, test } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
+test('keyboard error recovery, layout and accessible states', async ({ page }, testInfo) => {
+  await page.goto('/dev/primitives');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Small parts. A shared language.');
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('main')).toBeFocused();
+  await page.keyboard.press('Tab');
+  const input = page.getByRole('textbox', { name: 'Example name' });
+  await expect(input).toBeFocused();
+  await expect(input).toHaveCSS('outline-style', 'solid');
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('button', { name: 'Validate example' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('alert')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Enter');
+  await expect(input).toBeFocused();
+  await expect(input).toHaveAttribute('aria-invalid', 'true');
+  await expect(input).toHaveAccessibleDescription(/Enter a name for this example/);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await input.fill('Synthetic example');
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('status')).toHaveText('Example validated. Nothing was saved.');
+  await page.getByRole('button', { name: 'Reset' }).click();
+  await page.getByRole('button', { name: 'Show loading state' }).click();
+  await expect(page.getByRole('status')).toHaveText('Loading example content…');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(page.locator('.spinner')).toHaveCSS('animation-name', 'none');
+  await page.getByRole('button', { name: 'Show empty state' }).click();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length }))).toEqual({ local: 0, session: 0 });
+  await page.getByRole('button', { name: 'Show loading state' }).focus();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(page.getByRole('link', { name: 'Skip to content' })).not.toBeInViewport();
+  await page.screenshot({ path: `test-results/workshop-${testInfo.project.name}.png`, fullPage: true });
+  await page.setViewportSize({ width: 320, height: 700 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('route changes move focus and preserve browser navigation', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Interface workshop', exact: true }).click();
+  await expect(page.getByRole('main')).toBeFocused();
+  await expect(page).toHaveTitle('Interface workshop · AArchive');
+  await page.goBack();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Keep every effort in context.');
+});

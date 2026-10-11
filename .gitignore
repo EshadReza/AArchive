@@ -1,0 +1,68 @@
+# Secrets and machine-specific configuration. Commit safe examples instead.
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+credentials.local.*
+
+# Python environments, bytecode, tool caches, and build output.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+
+# JavaScript dependencies, generated assets, and test artifacts.
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# Runtime data and private archives; synthetic test fixtures stay tracked.
+/data/
+/media/
+/staticfiles/
+/staging/
+/uploads/
+/backups/
+/exports/
+/private/
+/tmp/
+/output/
+*.sqlite3
+*.sqlite3-journal
+*.log
+dump.rdb
+*.pid
+
+# Generated documentation exports. Markdown is the canonical documentation.
+/IUT-Platform-SRS.pdf
+/docs/IUT-Platform-SRS.pdf
+/docs/requirements.pdf
+/docs/generated/
+
+# Personal tools and OS/editor state.
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.codex/
+.agents/
+*.swp
+*.swo
+*~
+
+# Intentionally tracked: lockfiles, migrations, .env examples, CI configuration,
+# trusted redistributable schemas, small synthetic ZIP fixtures, and AGENTS.md.
